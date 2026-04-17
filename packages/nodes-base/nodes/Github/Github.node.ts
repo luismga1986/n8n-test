@@ -2200,6 +2200,18 @@ export class Github implements INodeType {
 			// Generate a webhook URL for the GitHub workflow to call when done
 			const resumeUrl = this.getWorkflowDataProxy(0).$execution.resumeUrl;
 
+			const resumeHostname = new URL(resumeUrl).hostname;
+			if (
+				['localhost', '127.0.0.1', '::1'].includes(resumeHostname) ||
+				resumeHostname.endsWith('.local')
+			) {
+				throw new NodeOperationError(
+					this.getNode(),
+					'The "Dispatch and Wait" operation requires n8n to be publicly accessible from the internet. Your n8n instance appears to be running on a local or desktop environment that GitHub cannot reach. Use n8n Cloud or a publicly accessible server to use this operation.',
+					{ itemIndex: 0 },
+				);
+			}
+
 			body.inputs = {
 				...inputs,
 				resumeUrl,

@@ -211,7 +211,7 @@ export class NodeTestHarness {
 
 		const additionalData = mock<IWorkflowExecuteAdditionalData>({
 			executionId: '1',
-			webhookWaitingBaseUrl: 'http://localhost/waiting-webhook',
+			webhookWaitingBaseUrl: 'https://test.n8n.io/waiting-webhook',
 			hooks,
 			// Get from node.parameters
 			currentNodeParameters: undefined,

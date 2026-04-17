@@ -372,6 +372,33 @@ describe('Test Github Node', () => {
 				}),
 			);
 		});
+
+		it.each(['http://localhost:5678/webhook-waiting/123', 'http://127.0.0.1:5678/webhook-waiting/123'])(
+			'should throw NodeOperationError when resumeUrl is a local address (%s)',
+			async (localResumeUrl) => {
+				mockExecutionContext.getWorkflowDataProxy = jest.fn().mockReturnValue({
+					$execution: {
+						resumeUrl: localResumeUrl,
+					},
+				});
+
+				mockExecutionContext.getNodeParameter.mockImplementation((parameterName: string) => {
+					if (parameterName === 'resource') return 'workflow';
+					if (parameterName === 'operation') return 'dispatchAndWait';
+					if (parameterName === 'owner') return 'testOwner';
+					if (parameterName === 'repository') return 'testRepository';
+					if (parameterName === 'workflowId') return '147025216';
+					if (parameterName === 'ref') return 'main';
+					if (parameterName === 'inputs') return '{}';
+					if (parameterName === 'authentication') return 'accessToken';
+					return '';
+				});
+
+				await expect(githubNode.execute.call(mockExecutionContext)).rejects.toThrow(
+					/local or desktop environment/,
+				);
+			},
+		);
 	});
 
 	describe('Workflow Operations', () => {
